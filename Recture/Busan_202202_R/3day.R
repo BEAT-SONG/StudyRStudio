@@ -23,7 +23,7 @@ dim(welfare) # dim()을 통해 확인
 str(welfare)
 summary(welfare)
 
-# 변수면 바꾸기
+# 변수명 바꾸기
 # 무조건 해야하는 것. 오른쪽의 값을 왼쪽 값으로 지정하는 것
 welfare = rename(welfare,
                  sex = h10_g3, # 성별
@@ -277,13 +277,211 @@ job_male = welfare %>%
 
 job_male
 
+# 여성 직업 빈도 상위 10개 추출
+job_female = welfare %>% 
+  filter(!is.na(job) & sex == "female") %>% 
+  group_by(job) %>% 
+  summarise(n=n()) %>%  # 개수 = 빈도
+  arrange(desc(n)) %>% 
+  head(10)
+
+job_female
+
+# 그래프 만들기
+ggplot(data = job_male, aes(x = reorder(job, n), y= n)) +
+  geom_col() +
+  coord_flip()
+
+ggplot(data = job_female, aes(x = reorder(job, n), y= n)) +
+  geom_col() +
+  coord_flip()
+
+# 종교 유무에 따른 이혼율
+# 종교가 있는 사람들이 이혼을 덜 할까?
+# 변수 검토하기
+class(welfare$religion) # 숫자 데이터
+
+table(welfare$religion)
+
+# 전처리
+# 종교 유무 이름 부여
+welfare$religion = ifelse(welfare$religion == 1, 'yes', 'no')
+table(welfare$religion)
+
+qplot(welfare$religion)
+
+# 혼인 상태 변수 컴토 및 전처리하기
+# 변수 검토하기
+class(welfare$marrtage)
+
+table(welfare$marrtage)
+
+# 이혼 여부 변수 만들기
+welfare$group_marriage = ifelse(welfare$marrtage == 1, 'marraiage',
+                                ifelse(welfare$marrtage == 3, 'divorce', NA))
+table(welfare$group_marriage)
+
+table(is.na(welfare$group_marriage))
+
+qplot(welfare$group_marriage)
+
+# 종교 유무에 따른 이혼율 분석하기
+# 종교 유무에 따른 이혼뉼 표 만들기
+religion_marriage = welfare %>% 
+  filter(!is.na(group_marriage)) %>% 
+  group_by(religion, group_marriage) %>% 
+  summarise(n=n()) %>% 
+  mutate(tot_group = sum(n)) %>% 
+  mutate(pct = round(n/tot_group*100, 1)) 
+# round(,1) : 소수점 둘째자리에서 반올림하며 첫째자리까지 표현
+
+religion_marriage
+
+# count() 활용
+# count() 함수 자체가 그룹화를 포함하는 함수이므로 count()를 쓰고 group_by()를 사용.
+# count() 보다 n()을 주로 사용용
+religion_marriage = welfare %>% 
+  filter(!is.na(group_marriage)) %>% 
+  count(religion, group_marriage) %>% 
+  group_by(religion) %>% 
+  nutate(pct = round(n/sum(n)*100,1))
+
+religion_marriage
+
+# 이혼율 표 만들기
+divorce = religion_marriage %>% 
+  filter(group_marriage == 'divorce') %>% 
+  select(religion, pct)
+
+divorce
+
+# 그래프 만들기
+ggplot(data= divorce, aes(x= religion, y=pct)) + geom_col()
 
 
+# 연령대 및 종교 유무에 따른 이혼율 분석하기
+# 연령대별 이혼율 표 만들기
+ageg_marriage = welfare %>% 
+  filter(!is.na(group_marriage)) %>%  # 필터링
+  group_by(ageg, group_marriage) %>%  # 그룹화
+  summarise(n=n()) %>%  # 그룹에 대한 집계 
+  mutate(tot_group = sum(n)) %>%  # 변수 추가
+  mutate(pct = round(n/tot_group*100, 1))
+
+ageg_marriage
+
+# count() 활용
+ageg_marriage <- welfare %>% 
+  filter(!is.na(group_marriage)) %>% 
+  count(ageg, group_marriage) %>% 
+  group_by(ageg) %>%
+  mutate(pct = round(n/sum(n)*100, 1))
+
+ageg_marriage
+
+# 연령대별 이혼율 그래프 만들기
+# 초년 제외, 이혼 추출
+ageg_divorce = ageg_marriage %>% 
+  filter(ageg != 'young' & group_marriage == 'divorce') %>% 
+  select(ageg, pct)
+
+ageg_divorce
+
+# 그래프 만들기
+ggplot(data = ageg_divorce, aes(x = ageg, y=pct)) + geom_col()
+
+# 연령대 및 종교 유무에 따른 이혼율 표 만들기
+# 연령대, 종교유무, 결혼 상태별 비율표 만들기
+ageg_religion_marriage <- welfare %>% 
+  filter(!is.na(group_marriage) & ageg != "young") %>% 
+  group_by(ageg,religion, group_marriage) %>% 
+  summarise(n = n()) %>%
+  mutate(tot_group = sum(n)) %>%
+  mutate(pct = round(n/tot_group*100, 1))
+
+ageg_religion_marriage
+
+# 연령대 및 종교 유무별 이혼율 표 만들기
+df_divorcr = ageg_religion_marriage %>% 
+  filter(group_marriage == 'divorce') %>% 
+  select(ageg, religion, pct)
+
+df_divorcr
+
+# 연령대 및 종교 유무에 따른 이혼율 그래프 만들기
+ggplot(data = df_divorcr, aes(x= ageg, y= pct, fill = religion)) +
+  geom_col(position = 'dodge')
 
 
+# 지역별 연령대 비율
+# 노년층이 많은 지역은 어디일까?
+# 변수 검토
+# 지역 변수 검토 및 전처리
+class(welfare$code_region)
 
+table(welfare$code_region)
 
+# 전처리
+# 지역 코드 만들기
+list_region = data.frame(code_region = c(1:7), # c(1:7): 1~7까지의 범위를 나타냄
+                         region = c('서울',
+                                    '수도권(인천/경기)',
+                                    '부산/경남/울산',
+                                    '대구/경북',
+                                    '대전/충남',
+                                    '강원/충북',
+                                    '광주/전남/전북/제주도'))
 
+list_region
 
+# welfare에 지역명 변수 추가
+welfare = left_join(welfare, list_region, id = "code_region")
 
+str(welfare)
 
+welfare %>% 
+  select(code_region, region) %>% 
+  head
+
+# 지역별 연령대 비율표 만들기
+region_ageg = welfare %>% 
+  group_by(region, ageg) %>% 
+  summarise(n = n()) %>% 
+  mutate(tot_group = sum(n)) %>% 
+  mutate(pct = round(n/tot_group*100,1))
+
+region_ageg
+
+# 그래프 만들기
+ggplot(data = region_ageg, aes(x = region, y = pct, fill = ageg)) +
+  geom_col() +
+  coord_flip()
+
+# 막대 정렬하기: 노년층 비율 높은 순
+list_order_old = region_ageg %>% 
+  filter(ageg == 'old') %>% 
+  arrange(pct)
+
+list_order_old
+
+# 지역명 순서 바꾸기
+order = list_order_old$region
+order
+
+# 연령대 군으로 막대 색깔 나열하기
+class(region_ageg$ageg)
+
+levels(region_ageg$ageg) # 범주(factor) 확인하기
+
+# factor 형으로 변수 변환
+region_ageg$ageg = factor(region_ageg$ageg, 
+                          levels = c('old','middle','young'))
+
+class(region_ageg$ageg)
+
+levels(region_ageg$ageg)
+
+ggplot(data= region_ageg, aes(x=region, y= pct, fill=ageg)) +
+  geom_col() +
+  coord_flip() +
+  scale_x_discrete(limts = order)
