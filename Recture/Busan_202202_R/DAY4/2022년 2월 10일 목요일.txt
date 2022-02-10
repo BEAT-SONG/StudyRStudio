@@ -10,8 +10,10 @@ a <- 1 (사람)
 aa <- 1,2,3,4
 [ㅁㅁㅁㅁ](하나의 덩어리를 4개로 쪼갬) <- 1,2,3,4
 
+- R에서 Oracle을 연결할 때 필요한 위치
+- C:\DEV\Server\Oracle\product\12.2.0\dbhome_1\inventory\backup\2022-01-11_01-17-21PM\Scripts\ext\jlib
 
-
+- 우선 kormap은 복사본으로 두기
 
 
 
