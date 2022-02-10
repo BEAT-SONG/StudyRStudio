@@ -86,6 +86,7 @@ df_word = rename(df_word,
 head(df_word)
 
 # 두 글자 이상 단어 추출
+# nchar('컬럼명'): 글자의 수를 뽑아내주는 함수
 df_word = filter(df_word, nchar(word) >= 2)
 
 head(df_word)
@@ -97,11 +98,136 @@ top_20 = df_word %>%
 
 top_20
 
+# 워드 클라우드 만들기
+# 패키지 준비하기
+# 패키지 설치
+install.packages('wordcloud')
+
+# 패키지 로드
+library(wordcloud)
+library(RColorBrewer)
+
+# 단어 색상 목록 만들기
+pal = brewer.pal(8, 'Dark2') # Dark2 라는 색상 목록에서 8개 색상 가져오기
+
+# 워드 클라우드 생성
+set.seed(1234) # 난수(무작위로 생성한 수) 고정
+wordcloud(words = df_word$word, # 단어
+          freq = df_word$freq, # 빈도
+          min.freq = 2, #최소 단어 빈도
+          max.words = 200, # 표현 단어 수
+          random.order = F, # 고빈도 단어 중앙 배치, 랜덤하게 퍼져나갈 수 있게
+          rot.per = .1, # 회전 단어 비율
+          scale = c(2,0.1), # 단어 크기 범위
+          colors = pal)# 색상 목록
+
+# 단어 색상 바꾸기
+pal = brewer.pal(9, 'Blues')
+
+set.seed(1234) # 난수(무작위로 생성한 수) 고정
+wordcloud(words = df_word$word, # 단어
+          freq = df_word$freq, # 빈도
+          min.freq = 2, #최소 단어 빈도
+          max.words = 200, # 표현 단어 수
+          random.order = F, # 고빈도 단어 중앙 배치, 랜덤하게 퍼져나갈 수 있게
+          rot.per = .1, # 회전 단어 비율
+          scale = c(3,0.2), # 단어 크기 범위
+          colors = pal)# 색상 목록
+
+# ----------------------------------------------------------------------
+# 국정원 트윗 텍스트 마이닝
+# 데이터 준비하기
+twitter = read.csv("./Data/twitter.csv",
+                   header = T,
+                   stringsAsFactors = F,
+                   fileEncoding = "UTF-8")
+
+# header는 엑셀파일을 불러올때 col_names와 같은 역할
+# 파일의 첫번째 열 이름을 지절하는 것
+# header = T 를 쓰면 파일에 있는 변수 이름 등 문자를 그대로 가져옴
+# header = F 는 변수 없이 숫자만 있을 경우에 입력
+# stringsAsFactors 는 문자열 컬럼을 팩터화 할 것인지 여부를 물어보는 역할
+# stringsAsFactors = F 는 문자열을 팩터로 인식하기 않음
+# stringsAsFactors = T 는 문자열을 팩터로 인식
+twitter = read.csv("./Data/twitter.csv",
+                   header = T,
+                   stringsAsFactors = F)
+twitter
+
+table(twitter)
+
+# 변수명 수정
+twitter = rename(twitter,
+                 no = 번호,
+                 id = 계정이름,
+                 data = 작성일,
+                 tw = 내용)
+
+twitter
+
+# 특수문자 제거
+# 한글깨짐 오류 미확인... 아직까지 완벽하게 발전되지 않은 부분
+# twitter$tw = str_replace_all(twitter$tw, '\\W', ' ')
+
+# twitter$tw
+# head(twitter$tw)
+
+# 트윗에서 명사 추출
+nouns <- extractNoun(twitter$tw)
+
+# 추출한 명사 list를 문자열 벡터로 변환, 단어별 빈도표 생성
+wordcount = table(unlist(nouns))
+
+# 데이터 프레임으로 변환
+df_word <- as.data.frame(wordcount, stringsAsFactors = F)
+
+head(df_word)
+
+# 변수명 수정
+df_word <- rename(df_word,
+                  word = Var1,
+                  freq = Freq)
+df_word
+
+head(df_word, 10)
+
+# 두 글자 이상 단어만 추출
+df_word = filter(df_word, nchar(word) >= 2)
+
+# 상위 20개 추출
+top20 = df_word %>% 
+  arrange(desc(freq)) %>% 
+  head(20)
+
+top20
+
+# 단어 빈도 막대 그래프 그리기
+library(ggplot2)
+
+order = arrange(top20, freq)$word
+
+ggplot(data= top20, aes(x=word, y=freq)) +
+  ylim(0,2500) +
+  geom_col() +
+  coord_flip() +
+  scale_x_discrete(limit = order) + # 빈도순 막대 정렬
+  geom_text(aes(label = freq), hjust = -0.3) # 빈도 표시
 
 
+# 워드 클라우드는 거의 비슷해서 복사해서 사용  
+# 단어 색상 목록 만들기
+pal = brewer.pal(8, 'Dark2') # Dark2 라는 색상 목록에서 8개 색상 가져오기
 
-
-
+# 워드 클라우드 생성
+set.seed(1234) # 난수(무작위로 생성한 수) 고정
+wordcloud(words = df_word$word, # 단어
+          freq = df_word$freq, # 빈도
+          min.freq = 10, #최소 단어 빈도
+          max.words = 200, # 표현 단어 수
+          random.order = F, # 고빈도 단어 중앙 배치, 랜덤하게 퍼져나갈 수 있게
+          rot.per = .1, # 회전 단어 비율
+          scale = c(3,0.1), # 단어 크기 범위
+          colors = pal)# 색상 목록
 
 
 
