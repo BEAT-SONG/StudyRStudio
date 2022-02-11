@@ -1,0 +1,42 @@
+2022년 2월 11일 금요일
+<Data의 종류>
+file datd :  txt, exel, csv, sav
+API : 특정 site에 들어가면 data를 JSON,VML의 형태를 줌 받은 데이터를 변환하여 사용해야함
+DB :  oracle, mysql, mtsql, mariadb, sqlite, NoSQL
+WebC(웹크롤링) : HTHL -> XML 
+
+<Data Basic(DB)>
+Server(서버) : Naver Web System
+- 응답(Respon)만 해줌
+- Oracle DBMS (Data 관리)
+
+Client(클라이언트) : 크롬, 브라우저
+- 요청(Request)만 함
+- 사람 -> Tool(SQL Developfer)) -> Creat User -> Creat Table -> Insert ect..
+	   ^
+	사람의 요구를 컴퓨터가 알아 들을 수 있게 변환해줌
+
++ 서버와 클라이언트를 연결해주는 통로 = 드라이버(Driver)
+
++ip:000.000.000.000
+
+Oracle DB Server = DBMS
+ 
+
+- 내 pc의 도메인 = localhost = 1027.0.0.1
+- 포트 = 1521(orcle) / 몇 동 몇 호 의 느낌 / 바뀔 수 있음
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
