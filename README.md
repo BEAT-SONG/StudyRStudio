@@ -92,3 +92,23 @@
     - class()
     - table(): 이상치( | 결측치) 유무 확인. 
 
+- 이상치 결측 처리
+
+- 데이터 시각화
+    - ggplot()
+    - + geom_line(), geom_bar(), geom_col()
+
+- 텍스트 마이닝(Text mining)
+    - KoNLP
+    - extractNoun 
+    - pal
+    - set.seed()
+    - wordcloud()
+
+### 4일차
+- 지도 시각화
+    - ggiraphExtra
+
+### 5일차
+- 인터랙티브 그래프
+- 오라클 연동라디
