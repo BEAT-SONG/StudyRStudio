@@ -1,5 +1,7 @@
-# StudyRStudio-
+# StudyRStudio
 빅데이터_RStudio_학습_리포지토리
+
+![RStudio](https://user-images.githubusercontent.com/97490673/165906254-134342e9-c49d-485f-8397-ad255081bb52.jpg)
 
 ### 1일차
 - 프로그램에 연결되어 있는 경로 확인
@@ -7,14 +9,19 @@
     - 경로(위치) 설정: setwd()
 
 - 파일 불러오기
-    - read.csv()
-    - read.excel()
+    - csv 파일 불러오기
+        - read.csv()
+    - execl 파일 불러오기 
+        - read.excel()
 
 - 데이터 프레임 만들기
     - data.frame()
 
+- 변수명 수정
+    - rename(데이터, 수정전_변수명 = 수정후_변수명)
+
 - 데이터 프레임 CSV 파일로 저장하기
-    - write.csv(,file=)
+    - write.csv( ,file=)
 
 - 데이터를 데이터 프레임 형태로 불러오기
     - as.data.frame()
@@ -33,7 +40,7 @@
     df
 
 - 조건문 사용
-    - ifelse(): (조건, 참일때, 거짓일때)
+    - ifelse( , , ): (조건, 참일때, 거짓일때)
 
 - %>%, %in%
     - %>%: ~ 중에서, 뒤에 함수 사용
@@ -107,7 +114,10 @@
 
 ### 4일차
 - 지도 시각화
-    - ggiraphExtra
+    - 패키지(라이브러리)
+        - ggiraphExtra
+- rownames_to_column()
+- 
 
 ### 5일차
 - 인터랙티브 그래프
